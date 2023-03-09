@@ -10,5 +10,6 @@ import (
 func main() {
 	server.Serve(plugin.NewProvider, []func() schema.ResourceService{
 		plugin.NewDatasourceResource,
+		plugin.NewHypertableResource,
 	})
 }
