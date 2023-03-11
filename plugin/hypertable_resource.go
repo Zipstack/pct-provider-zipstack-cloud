@@ -229,6 +229,7 @@ func (r *hypertableResource) Read(req *schema.ServiceRequest) *schema.ServiceRes
 	return &res
 }
 
+// Update the resource information
 func (r *hypertableResource) Update(req *schema.ServiceRequest) *schema.ServiceResponse {
 	// logger := fwhelpers.GetLogger()
 
@@ -284,7 +285,7 @@ func (r *hypertableResource) Update(req *schema.ServiceRequest) *schema.ServiceR
 	}
 }
 
-// Delete deletes the resource and removes the Terraform state on success.
+// Delete deletes the resource and removes the state on success.
 func (r *hypertableResource) Delete(req *schema.ServiceRequest) *schema.ServiceResponse {
 	// Delete existing source
 	err := r.Client.DeleteHypertable(req.StateID)

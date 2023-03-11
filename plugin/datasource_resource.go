@@ -305,7 +305,7 @@ func (r *datasourceResource) Update(req *schema.ServiceRequest) *schema.ServiceR
 	}
 }
 
-// Delete deletes the resource and removes the Terraform state on success.
+// Delete deletes the resource and removes the state on success.
 func (r *datasourceResource) Delete(req *schema.ServiceRequest) *schema.ServiceResponse {
 	// Delete existing source
 	err := r.Client.DeleteDatasource(req.StateID)
