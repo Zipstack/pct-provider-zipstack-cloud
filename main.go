@@ -7,8 +7,11 @@ import (
 	"github.com/zipstack/pct-provider-zmesh/plugin"
 )
 
+// Set while building the compiled binary.
+var version string
+
 func main() {
-	server.Serve(plugin.NewProvider, []func() schema.ResourceService{
+	server.Serve(version, plugin.NewProvider, []func() schema.ResourceService{
 		plugin.NewDatasourceResource,
 		plugin.NewHypertableResource,
 	})
