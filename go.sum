@@ -3,7 +3,7 @@ github.com/valyala/gorpc v0.0.0-20160519171614-908281bef774 h1:SUHFQHAaySqF0YHCm
 github.com/valyala/gorpc v0.0.0-20160519171614-908281bef774/go.mod h1:8uNqM1i7pr0jO7gdvbNCgsSa8Ki2vMh7JCQxO9BlF90=
 github.com/zclconf/go-cty v1.12.1 h1:PcupnljUm9EIvbgSHQnHhUr3fO6oFmkOrvs2BAFNXXY=
 github.com/zclconf/go-cty v1.12.1/go.mod h1:s9IfD1LK5ccNMSWCVFCE2rJfHiZgi7JijgeWIMfhLvA=
-github.com/zipstack/pct-plugin-framework v0.0.0-20230215062102-62dd70bf423a h1:elgfSz2uUAqCYWCSjW3Jb2xpQN/nqWid/G9hVGlcew0=
-github.com/zipstack/pct-plugin-framework v0.0.0-20230215062102-62dd70bf423a/go.mod h1:kaLETLlMFbbqLsdxAC02AC7ya3muKPPLvws8vUQZj4M=
+github.com/zipstack/pct-plugin-framework v0.0.0-20230311114416-36a1181a89c4 h1:jJ/+sgHXKLzD1N+yWTwrT9FV4tRxSEXthI+6+wgay8E=
+github.com/zipstack/pct-plugin-framework v0.0.0-20230311114416-36a1181a89c4/go.mod h1:kaLETLlMFbbqLsdxAC02AC7ya3muKPPLvws8vUQZj4M=
 golang.org/x/text v0.7.0 h1:4BRB4x83lYWy72KwLD/qYDuTu7q9PjSagHvijDw7cLo=
 golang.org/x/text v0.7.0/go.mod h1:mrYo+phRRbMaCq/xk9113O4dZlRixOauAjOtrjsXDZ8=
