@@ -39,7 +39,36 @@ archives:
 checksum:
   name_template: '{{ .ProjectName }}_{{ .Version }}_SHA256SUMS'
   algorithm: sha256
+# https://goreleaser.com/customization/release/
 release:
   draft: false
+  prerelease: auto
+# https://goreleaser.com/customization/changelog/
+# https://github.com/goreleaser/goreleaser/releases
 changelog:
-  skip: true
+  skip: false
+  use: github
+  sort: asc
+  groups:
+    - title: Dependency updates
+      regexp: '^.*?(feat|fix)\(deps\)!?:.+$'
+      order: 300
+    - title: 'New features'
+      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      order: 100
+    - title: 'Bug fixes'
+      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
+      order: 200
+    - title: 'Documentation updates'
+      regexp: ^.*?doc(\([[:word:]]+\))??!?:.+$
+      order: 400
+    - title: 'Build process updates'
+      regexp: ^.*?build(\([[:word:]]+\))??!?:.+$
+      order: 400
+    - title: Others
+      order: 9999
+  filters:
+    exclude:
+    - '^test:'
+    - '^chore:'
+    - '^merge:'
