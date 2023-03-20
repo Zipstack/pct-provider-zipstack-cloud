@@ -6,14 +6,16 @@ import (
 )
 
 type Hypertable struct {
-	Id          string   `json:"id,omitempty"`
-	Name        string   `json:"name,omitempty"`
-	Description string   `json:"description,omitempty"`
-	ShortName   string   `json:"shortName,omitempty"`
-	Tags        []string `json:"tags,omitempty"`
-	Admins      []string `json:"admins,omitempty"`
-	RefreshMode string   `json:"refreshMode,omitempty"`
-	SqlSelect   string   `json:"sqlSelect,omitempty"`
+	Id               string   `json:"id,omitempty"`
+	LastModifiedDate string   `json:"lastModifiedDate,omitempty"`
+	Name             string   `json:"name"`
+	Description      string   `json:"description"`
+	ShortName        string   `json:"shortName"`
+	Tags             []string `json:"tags"`
+	Admins           []string `json:"admins"`
+	RefreshMode      string   `json:"refreshMode"`
+	SqlSelect        string   `json:"sqlSelect"`
+	Deleted          bool     `json:"deleted,omitempty"`
 }
 
 func (c *Client) CreateHypertable(payload Hypertable) (Hypertable, error) {

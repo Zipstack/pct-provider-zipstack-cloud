@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/zipstack/pct-plugin-framework/fwhelpers"
@@ -74,7 +75,7 @@ func (r *datasourceResource) Configure(req *schema.ServiceRequest) *schema.Servi
 // Schema defines the schema for the resource.
 func (r *datasourceResource) Schema() *schema.ServiceResponse {
 	s := &schema.Schema{
-		Description: "Datasource Pipedrive resource for ZMesh",
+		Description: "Datasource resource for ZMesh",
 		Attributes: map[string]schema.Attribute{
 			"id": &schema.StringAttribute{
 				Description: "ID",
@@ -218,22 +219,36 @@ func (r *datasourceResource) Read(req *schema.ServiceRequest) *schema.ServiceRes
 			return schema.ErrorResponse(err)
 		}
 
-		// Update state with refreshed value
-		state.Id = datasource.Id
-		state.Name = datasource.Name
-		state.Description = datasource.Description
-		state.Tags = datasource.Tags
-		state.Admins = datasource.Admins
-		state.ShortName = datasource.ShortName
-		state.ConnectionMetadata = datasource.ConnectionMetadata
-		state.DbConnector = datasource.DbConnector
-		state.DbSubConnector = datasource.DbSubConnector
-		state.DbSubConnectorDisplayName = datasource.DbSubConnectorDisplayName
+		if datasource.Deleted {
+			// Datasource does not exist.
+			res.StateID = ""
+			res.StateLastUpdated = ""
+		} else {
+			// Update state with refreshed value
+			state.Id = datasource.Id
+			state.Name = datasource.Name
+			state.Description = datasource.Description
+			state.Tags = datasource.Tags
+			state.Admins = datasource.Admins
+			state.ShortName = datasource.ShortName
+			state.ConnectionMetadata = datasource.ConnectionMetadata
+			state.DbConnector = datasource.DbConnector
+			state.DbSubConnector = datasource.DbSubConnector
+			state.DbSubConnectorDisplayName = datasource.DbSubConnectorDisplayName
 
-		res.StateID = datasource.Id
+			t := strings.Split(datasource.LastModifiedDate, ".")[0] + "Z"
+			tp, err := time.Parse(time.RFC3339, t)
+			if err != nil {
+				return schema.ErrorResponse(err)
+			}
+
+			res.StateID = datasource.Id
+			res.StateLastUpdated = tp.Format(time.RFC850)
+		}
 	} else {
 		// No previous state exists.
 		res.StateID = ""
+		res.StateLastUpdated = ""
 	}
 
 	// Set refreshed state
@@ -298,10 +313,16 @@ func (r *datasourceResource) Update(req *schema.ServiceRequest) *schema.ServiceR
 		return schema.ErrorResponse(err)
 	}
 
+	t := strings.Split(datasource.LastModifiedDate, ".")[0] + "Z"
+	tp, err := time.Parse(time.RFC3339, t)
+	if err != nil {
+		return schema.ErrorResponse(err)
+	}
+
 	return &schema.ServiceResponse{
 		StateID:          datasource.Id,
 		StateContents:    stateEnc,
-		StateLastUpdated: time.Now().Format(time.RFC850),
+		StateLastUpdated: tp.Format(time.RFC850),
 	}
 }
 

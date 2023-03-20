@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/zipstack/pct-plugin-framework/fwhelpers"
@@ -203,20 +204,34 @@ func (r *hypertableResource) Read(req *schema.ServiceRequest) *schema.ServiceRes
 			return schema.ErrorResponse(err)
 		}
 
-		// Update state with refreshed value
-		state.Id = hypertable.Id
-		state.Name = hypertable.Name
-		state.Description = hypertable.Description
-		state.Tags = hypertable.Tags
-		state.Admins = hypertable.Admins
-		state.ShortName = hypertable.ShortName
-		state.RefreshMode = hypertable.RefreshMode
-		state.SqlSelect = hypertable.SqlSelect
+		if hypertable.Deleted {
+			// Hypertable does not exist.
+			res.StateID = ""
+			res.StateLastUpdated = ""
+		} else {
+			// Update state with refreshed value
+			state.Id = hypertable.Id
+			state.Name = hypertable.Name
+			state.Description = hypertable.Description
+			state.Tags = hypertable.Tags
+			state.Admins = hypertable.Admins
+			state.ShortName = hypertable.ShortName
+			state.RefreshMode = hypertable.RefreshMode
+			state.SqlSelect = hypertable.SqlSelect
 
-		res.StateID = hypertable.Id
+			t := strings.Split(hypertable.LastModifiedDate, ".")[0] + "Z"
+			tp, err := time.Parse(time.RFC3339, t)
+			if err != nil {
+				return schema.ErrorResponse(err)
+			}
+
+			res.StateID = hypertable.Id
+			res.StateLastUpdated = tp.Format(time.RFC850)
+		}
 	} else {
 		// No previous state exists.
 		res.StateID = ""
+		res.StateLastUpdated = ""
 	}
 
 	// Set refreshed state
@@ -278,10 +293,16 @@ func (r *hypertableResource) Update(req *schema.ServiceRequest) *schema.ServiceR
 		return schema.ErrorResponse(err)
 	}
 
+	t := strings.Split(hypertable.LastModifiedDate, ".")[0] + "Z"
+	tp, err := time.Parse(time.RFC3339, t)
+	if err != nil {
+		return schema.ErrorResponse(err)
+	}
+
 	return &schema.ServiceResponse{
 		StateID:          hypertable.Id,
 		StateContents:    stateEnc,
-		StateLastUpdated: time.Now().Format(time.RFC850),
+		StateLastUpdated: tp.Format(time.RFC850),
 	}
 }
 
