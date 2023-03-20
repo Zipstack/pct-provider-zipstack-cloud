@@ -7,15 +7,16 @@ import (
 
 type Datasource struct {
 	Id                        string   `json:"id,omitempty"`
-	Name                      string   `json:"name,omitempty"`
-	Description               string   `json:"description,omitempty"`
-	Tags                      []string `json:"tags,omitempty"`
-	Admins                    []string `json:"admins,omitempty"`
-	ShortName                 string   `json:"shortName,omitempty"`
-	ConnectionMetadata        string   `json:"connectionMetadata,omitempty"`
-	DbConnector               string   `json:"dbConnector,omitempty"`
-	DbSubConnector            string   `json:"dbSubConnector,omitempty"`
-	DbSubConnectorDisplayName string   `json:"dbSubConnectorDisplayName,omitempty"`
+	LastModifiedDate          string   `json:"lastModifiedDate,omitempty"`
+	Name                      string   `json:"name"`
+	Description               string   `json:"description"`
+	Tags                      []string `json:"tags"`
+	Admins                    []string `json:"admins"`
+	ShortName                 string   `json:"shortName"`
+	ConnectionMetadata        string   `json:"connectionMetadata"`
+	DbConnector               string   `json:"dbConnector"`
+	DbSubConnector            string   `json:"dbSubConnector"`
+	DbSubConnectorDisplayName string   `json:"dbSubConnectorDisplayName"`
 	Deleted                   bool     `json:"deleted,omitempty"`
 }
 
