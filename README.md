@@ -1,2 +1,2 @@
-# pct-provider-zmesh
-ZMesh provider plugin for PCT
+# pct-provider-zipstack-cloud
+Zipstack Cloud provider plugin for PCT

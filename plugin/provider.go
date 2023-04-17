@@ -6,7 +6,7 @@ import (
 	"github.com/zipstack/pct-plugin-framework/fwhelpers"
 	"github.com/zipstack/pct-plugin-framework/schema"
 
-	"github.com/zipstack/pct-provider-zmesh/api"
+	"github.com/zipstack/pct-provider-zipstack-cloud/api"
 )
 
 // Provider implementation.
@@ -17,10 +17,10 @@ type Provider struct {
 
 // Model maps the provider state as per schema.
 type ProviderModel struct {
-	Host             string `cty:"host"`
-	OrganisationName string `cty:"organisationname"`
-	Email            string `cty:"email"`
-	Password         string `cty:"password"`
+	Host             string `pctsdk:"host"`
+	OrganisationName string `pctsdk:"organisationname"`
+	Email            string `pctsdk:"email"`
+	Password         string `pctsdk:"password"`
 }
 
 // Ensure the implementation satisfies the expected interfaces
@@ -36,7 +36,7 @@ func NewProvider() schema.ProviderService {
 // Metadata returns the provider type name.
 func (p *Provider) Metadata(req *schema.ServiceRequest) *schema.ServiceResponse {
 	return &schema.ServiceResponse{
-		TypeName: "zmesh",
+		TypeName: "zipstack_cloud",
 	}
 }
 

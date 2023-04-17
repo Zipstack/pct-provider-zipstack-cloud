@@ -8,7 +8,7 @@ import (
 	"github.com/zipstack/pct-plugin-framework/fwhelpers"
 	"github.com/zipstack/pct-plugin-framework/schema"
 
-	"github.com/zipstack/pct-provider-zmesh/api"
+	"github.com/zipstack/pct-provider-zipstack-cloud/api"
 )
 
 // Resource implementation.
@@ -17,14 +17,14 @@ type hypertableResource struct {
 }
 
 type hypertableResourceModel struct {
-	Id          string   `cty:"id"`
-	Name        string   `cty:"name"`
-	Description string   `cty:"description"`
-	ShortName   string   `cty:"short_name"`
-	Tags        []string `cty:"tags"`
-	Admins      []string `cty:"admins"`
-	RefreshMode string   `cty:"refresh_mode"`
-	SqlSelect   string   `cty:"sql_select"`
+	Id          string   `pctsdk:"id"`
+	Name        string   `pctsdk:"name"`
+	Description string   `pctsdk:"description"`
+	ShortName   string   `pctsdk:"short_name"`
+	Tags        []string `pctsdk:"tags"`
+	Admins      []string `pctsdk:"admins"`
+	RefreshMode string   `pctsdk:"refresh_mode"`
+	SqlSelect   string   `pctsdk:"sql_select"`
 }
 
 // Ensure the implementation satisfies the expected interfaces.
