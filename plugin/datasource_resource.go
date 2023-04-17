@@ -8,7 +8,7 @@ import (
 	"github.com/zipstack/pct-plugin-framework/fwhelpers"
 	"github.com/zipstack/pct-plugin-framework/schema"
 
-	"github.com/zipstack/pct-provider-zmesh/api"
+	"github.com/zipstack/pct-provider-zipstack-cloud/api"
 )
 
 // Resource implementation.
@@ -17,16 +17,16 @@ type datasourceResource struct {
 }
 
 type datasourceResourceModel struct {
-	Id                        string   `cty:"id"`
-	Name                      string   `cty:"name"`
-	Description               string   `cty:"description"`
-	Tags                      []string `cty:"tags"`
-	Admins                    []string `cty:"admins"`
-	ShortName                 string   `cty:"short_name"`
-	ConnectionMetadata        string   `cty:"connection_metadata"`
-	DbConnector               string   `cty:"db_connector"`
-	DbSubConnector            string   `cty:"db_sub_connector"`
-	DbSubConnectorDisplayName string   `cty:"db_sub_connector_display_name"`
+	Id                        string   `pctsdk:"id"`
+	Name                      string   `pctsdk:"name"`
+	Description               string   `pctsdk:"description"`
+	Tags                      []string `pctsdk:"tags"`
+	Admins                    []string `pctsdk:"admins"`
+	ShortName                 string   `pctsdk:"short_name"`
+	ConnectionMetadata        string   `pctsdk:"connection_metadata"`
+	DbConnector               string   `pctsdk:"db_connector"`
+	DbSubConnector            string   `pctsdk:"db_sub_connector"`
+	DbSubConnectorDisplayName string   `pctsdk:"db_sub_connector_display_name"`
 }
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -75,7 +75,7 @@ func (r *datasourceResource) Configure(req *schema.ServiceRequest) *schema.Servi
 // Schema defines the schema for the resource.
 func (r *datasourceResource) Schema() *schema.ServiceResponse {
 	s := &schema.Schema{
-		Description: "Datasource resource for ZMesh",
+		Description: "Datasource resource for Zipstack Cloud",
 		Attributes: map[string]schema.Attribute{
 			"id": &schema.StringAttribute{
 				Description: "ID",
@@ -97,16 +97,15 @@ func (r *datasourceResource) Schema() *schema.ServiceResponse {
 				NestedAttribute: &schema.StringAttribute{
 					Description: "Tag",
 					Required:    true,
-					Optional:    true,
 				},
 			},
 			"admins": &schema.ListAttribute{
 				Description: "Admins",
-				Required:    false,
+				Required:    true,
+				Optional:    true,
 				NestedAttribute: &schema.StringAttribute{
 					Description: "Admin",
 					Required:    true,
-					Optional:    true,
 				},
 			},
 			"short_name": &schema.StringAttribute{

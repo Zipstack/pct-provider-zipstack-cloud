@@ -1,11 +1,11 @@
 github.com/apparentlymart/go-textseg/v13 v13.0.0 h1:Y+KvPE1NYz0xl601PVImeQfFyEy6iT90AvPUL1NNfNw=
 github.com/apparentlymart/go-textseg/v13 v13.0.0/go.mod h1:ZK2fH7c4NqDTLtiYLvIkEghdlcqw7yxLeM89kiTRPUo=
-github.com/google/go-cmp v0.3.1 h1:Xye71clBPdm5HgqGwUkwhbynsUJZhDbS20FvLhQ2izg=
+github.com/google/go-cmp v0.5.8 h1:e6P7q2lk1O+qJJb4BtCQXlK8vWEO8V1ZeuEdJNOqZyg=
 github.com/valyala/gorpc v0.0.0-20160519171614-908281bef774 h1:SUHFQHAaySqF0YHCmmm0EIFooFZpDPpi5KTom7YJ07c=
 github.com/valyala/gorpc v0.0.0-20160519171614-908281bef774/go.mod h1:8uNqM1i7pr0jO7gdvbNCgsSa8Ki2vMh7JCQxO9BlF90=
-github.com/zclconf/go-cty v1.13.0 h1:It5dfKTTZHe9aeppbNOda3mN7Ag7sg6QkBNm6TkyFa0=
-github.com/zclconf/go-cty v1.13.0/go.mod h1:YKQzy/7pZ7iq2jNFzy5go57xdxdWoLLpaEp4u238AE0=
-github.com/zipstack/pct-plugin-framework v1.0.0 h1:PGxXobWqWH31hhvl1ql1BxbKxrrubU/g5uZklXxB+Yg=
-github.com/zipstack/pct-plugin-framework v1.0.0/go.mod h1:kaLETLlMFbbqLsdxAC02AC7ya3muKPPLvws8vUQZj4M=
+github.com/zipstack/go-cty v1.13.1-pct.1 h1:kstog34t8kcL5+Wb51wkvYW2e4exi1Jpw4xm9xsEc9c=
+github.com/zipstack/go-cty v1.13.1-pct.1/go.mod h1:YKQzy/7pZ7iq2jNFzy5go57xdxdWoLLpaEp4u238AE0=
+github.com/zipstack/pct-plugin-framework v1.1.0 h1:rxKRfN/6wtURhHT9B63F2+2wOCvv3SApGxWzjzabW1k=
+github.com/zipstack/pct-plugin-framework v1.1.0/go.mod h1:OQNOdOoEEVYsNvfVrcJDZlk4lDqXJGQlH4zrQBaHuDE=
 golang.org/x/text v0.8.0 h1:57P1ETyNKtuIjB4SRd15iJxuhj8Gc416Y78H3qgMh68=
 golang.org/x/text v0.8.0/go.mod h1:e1OnstbJyHTd6l/uOt8jFFHp6TRDWZR/bV3emEE/zU8=
