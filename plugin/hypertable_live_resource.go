@@ -12,11 +12,11 @@ import (
 )
 
 // Resource implementation.
-type hypertableResource struct {
+type hypertableLiveResource struct {
 	Client *api.Client
 }
 
-type hypertableResourceModel struct {
+type hypertableLiveResourceModel struct {
 	Id          string   `pctsdk:"id"`
 	Name        string   `pctsdk:"name"`
 	Description string   `pctsdk:"description"`
@@ -29,24 +29,24 @@ type hypertableResourceModel struct {
 
 // Ensure the implementation satisfies the expected interfaces.
 var (
-	_ schema.ResourceService = &hypertableResource{}
+	_ schema.ResourceService = &hypertableLiveResource{}
 )
 
 // Helper function to return a resource service instance.
-func NewHypertableResource() schema.ResourceService {
-	return &hypertableResource{}
+func NewHypertableLiveResource() schema.ResourceService {
+	return &hypertableLiveResource{}
 }
 
 // Metadata returns the resource type name.
 // It is always provider name + "_" + resource type name.
-func (r *hypertableResource) Metadata(req *schema.ServiceRequest) *schema.ServiceResponse {
+func (r *hypertableLiveResource) Metadata(req *schema.ServiceRequest) *schema.ServiceResponse {
 	return &schema.ServiceResponse{
-		TypeName: req.TypeName + "_hypertable",
+		TypeName: req.TypeName + "_hypertable_live",
 	}
 }
 
 // Configure adds the provider configured client to the resource.
-func (r *hypertableResource) Configure(req *schema.ServiceRequest) *schema.ServiceResponse {
+func (r *hypertableLiveResource) Configure(req *schema.ServiceRequest) *schema.ServiceResponse {
 	if req.ResourceData == "" {
 		return schema.ErrorResponse(fmt.Errorf("no data provided to configure resource"))
 	}
@@ -71,9 +71,9 @@ func (r *hypertableResource) Configure(req *schema.ServiceRequest) *schema.Servi
 }
 
 // Schema defines the schema for the resource.
-func (r *hypertableResource) Schema() *schema.ServiceResponse {
+func (r *hypertableLiveResource) Schema() *schema.ServiceResponse {
 	s := &schema.Schema{
-		Description: "Hypertable resource for ZMesh",
+		Description: "Hypertable resource for Zipstack Cloud",
 		Attributes: map[string]schema.Attribute{
 			"id": &schema.StringAttribute{
 				Description: "ID",
@@ -99,16 +99,15 @@ func (r *hypertableResource) Schema() *schema.ServiceResponse {
 				NestedAttribute: &schema.StringAttribute{
 					Description: "Tag",
 					Required:    true,
-					Optional:    true,
 				},
 			},
 			"admins": &schema.ListAttribute{
 				Description: "Admins",
-				Required:    false,
+				Required:    true,
+				Optional:    true,
 				NestedAttribute: &schema.StringAttribute{
 					Description: "Admin",
 					Required:    true,
-					Optional:    true,
 				},
 			},
 			"refresh_mode": &schema.StringAttribute{
@@ -133,11 +132,11 @@ func (r *hypertableResource) Schema() *schema.ServiceResponse {
 }
 
 // Create a new resource
-func (r *hypertableResource) Create(req *schema.ServiceRequest) *schema.ServiceResponse {
+func (r *hypertableLiveResource) Create(req *schema.ServiceRequest) *schema.ServiceResponse {
 	// logger := fwhelpers.GetLogger()
 
 	// Retrieve values from plan
-	var plan hypertableResourceModel
+	var plan hypertableLiveResourceModel
 	err := fwhelpers.UnpackModel(req.PlanContents, &plan)
 	if err != nil {
 		return schema.ErrorResponse(err)
@@ -160,7 +159,7 @@ func (r *hypertableResource) Create(req *schema.ServiceRequest) *schema.ServiceR
 	}
 
 	// Update resource state with response body
-	state := hypertableResourceModel{}
+	state := hypertableLiveResourceModel{}
 	state.Id = hypertable.Id
 	state.Name = plan.Name
 	state.Description = plan.Description
@@ -184,10 +183,10 @@ func (r *hypertableResource) Create(req *schema.ServiceRequest) *schema.ServiceR
 }
 
 // Read resource information
-func (r *hypertableResource) Read(req *schema.ServiceRequest) *schema.ServiceResponse {
+func (r *hypertableLiveResource) Read(req *schema.ServiceRequest) *schema.ServiceResponse {
 	// logger := fwhelpers.GetLogger()
 
-	var state hypertableResourceModel
+	var state hypertableLiveResourceModel
 
 	// Get current state
 	err := fwhelpers.UnpackModel(req.StateContents, &state)
@@ -245,11 +244,11 @@ func (r *hypertableResource) Read(req *schema.ServiceRequest) *schema.ServiceRes
 }
 
 // Update the resource information
-func (r *hypertableResource) Update(req *schema.ServiceRequest) *schema.ServiceResponse {
+func (r *hypertableLiveResource) Update(req *schema.ServiceRequest) *schema.ServiceResponse {
 	// logger := fwhelpers.GetLogger()
 
 	// Retrieve values from plan
-	var plan hypertableResourceModel
+	var plan hypertableLiveResourceModel
 	err := fwhelpers.UnpackModel(req.PlanContents, &plan)
 	if err != nil {
 		return schema.ErrorResponse(err)
@@ -277,7 +276,7 @@ func (r *hypertableResource) Update(req *schema.ServiceRequest) *schema.ServiceR
 	}
 
 	// Update state with refreshed value
-	state := hypertableResourceModel{}
+	state := hypertableLiveResourceModel{}
 	state.Id = hypertable.Id
 	state.Name = hypertable.Name
 	state.Description = hypertable.Description
@@ -307,7 +306,7 @@ func (r *hypertableResource) Update(req *schema.ServiceRequest) *schema.ServiceR
 }
 
 // Delete deletes the resource and removes the state on success.
-func (r *hypertableResource) Delete(req *schema.ServiceRequest) *schema.ServiceResponse {
+func (r *hypertableLiveResource) Delete(req *schema.ServiceRequest) *schema.ServiceResponse {
 	// Delete existing source
 	err := r.Client.DeleteHypertable(req.StateID)
 	if err != nil {

@@ -43,22 +43,19 @@ func (p *Provider) Metadata(req *schema.ServiceRequest) *schema.ServiceResponse 
 // Schema defines the provider-level schema for configuration data.
 func (p *Provider) Schema() *schema.ServiceResponse {
 	s := &schema.Schema{
-		Description: "ZMesh provider plugin",
+		Description: "Zipstack Cloud provider plugin",
 		Attributes: map[string]schema.Attribute{
 			"host": &schema.StringAttribute{
 				Description: "Host",
 				Required:    true,
-				Sensitive:   false,
 			},
 			"organisationname": &schema.StringAttribute{
 				Description: "Organisation Name",
 				Required:    true,
-				Sensitive:   false,
 			},
 			"email": &schema.StringAttribute{
 				Description: "Email",
 				Required:    true,
-				Sensitive:   false,
 			},
 			"password": &schema.StringAttribute{
 				Description: "Password",

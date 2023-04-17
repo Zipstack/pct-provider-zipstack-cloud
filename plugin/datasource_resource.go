@@ -75,7 +75,7 @@ func (r *datasourceResource) Configure(req *schema.ServiceRequest) *schema.Servi
 // Schema defines the schema for the resource.
 func (r *datasourceResource) Schema() *schema.ServiceResponse {
 	s := &schema.Schema{
-		Description: "Datasource resource for ZMesh",
+		Description: "Datasource resource for Zipstack Cloud",
 		Attributes: map[string]schema.Attribute{
 			"id": &schema.StringAttribute{
 				Description: "ID",
@@ -97,16 +97,15 @@ func (r *datasourceResource) Schema() *schema.ServiceResponse {
 				NestedAttribute: &schema.StringAttribute{
 					Description: "Tag",
 					Required:    true,
-					Optional:    true,
 				},
 			},
 			"admins": &schema.ListAttribute{
 				Description: "Admins",
-				Required:    false,
+				Required:    true,
+				Optional:    true,
 				NestedAttribute: &schema.StringAttribute{
 					Description: "Admin",
 					Required:    true,
-					Optional:    true,
 				},
 			},
 			"short_name": &schema.StringAttribute{

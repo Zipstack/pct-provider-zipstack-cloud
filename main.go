@@ -13,6 +13,6 @@ var version string
 func main() {
 	server.Serve(version, plugin.NewProvider, []func() schema.ResourceService{
 		plugin.NewDatasourceResource,
-		plugin.NewHypertableResource,
+		plugin.NewHypertableLiveResource,
 	})
 }
