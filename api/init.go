@@ -26,7 +26,7 @@ type Client struct {
 func NewClient(host string, orgname string, email string, password string) (*Client, error) {
 	c := Client{
 		HTTPClient: &http.Client{
-			Timeout: time.Duration(30) * time.Second,
+			Timeout: time.Duration(120) * time.Second,
 		},
 		Host:             host,
 		OrganisationName: orgname,
