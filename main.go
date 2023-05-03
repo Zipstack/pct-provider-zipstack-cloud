@@ -14,5 +14,6 @@ func main() {
 	server.Serve(version, plugin.NewProvider, []func() schema.ResourceService{
 		plugin.NewDatasourceResource,
 		plugin.NewHypertableLiveResource,
+		plugin.NewHypertableScheduledResource,
 	})
 }
