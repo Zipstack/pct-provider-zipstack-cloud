@@ -70,7 +70,9 @@ DO_REQUEST:
 	}
 	req.Header.Add("Accept", "*/*")
 	req.Header.Add("User-Agent", "PCT")
-	req.Header.Add("Content-Type", "application/json")
+	if !strings.Contains(url, "/hypertable/activate") {
+		req.Header.Add("Content-Type", "application/json")
+	}
 	if !strings.Contains(url, "/login") {
 		req.Header.Add(c.TokenHeader, c.Token)
 	}
