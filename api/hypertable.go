@@ -6,16 +6,37 @@ import (
 )
 
 type Hypertable struct {
-	Id               string   `json:"id,omitempty"`
-	LastModifiedDate string   `json:"lastModifiedDate,omitempty"`
-	Name             string   `json:"name"`
-	Description      string   `json:"description"`
-	ShortName        string   `json:"shortName"`
-	Tags             []string `json:"tags"`
-	Admins           []string `json:"admins"`
-	RefreshMode      string   `json:"refreshMode"`
-	SqlSelect        string   `json:"sqlSelect"`
-	Deleted          bool     `json:"deleted,omitempty"`
+	Id                     string                     `json:"id,omitempty"`
+	LastModifiedDate       string                     `json:"lastModifiedDate,omitempty"`
+	Name                   string                     `json:"name"`
+	Description            string                     `json:"description"`
+	ShortName              string                     `json:"shortName"`
+	Tags                   []string                   `json:"tags"`
+	Admins                 []string                   `json:"admins"`
+	RefreshMode            string                     `json:"refreshMode"`
+	SqlSelect              string                     `json:"sqlSelect,omitempty"`
+	CronTiming             string                     `json:"cronTiming,omitempty"`
+	CronTimingString       string                     `json:"cronTimingString,omitempty"`
+	Stages                 []HypertableScheduledStage `json:"stages,omitempty"`
+	BackingTable           string                     `json:"backingTable,omitempty"`
+	BackingTableUpdateMode string                     `json:"backingTableUpdateMode,omitempty"`
+	PrimaryKeys            []string                   `json:"primaryKeys,omitempty"`
+	PartitionKeys          []string                   `json:"partitionKeys,omitempty"`
+	RESTEndpoint           string                     `json:"restEndpoint,omitempty"`
+	Status                 bool                       `json:"status,omitempty"`
+	Deleted                bool                       `json:"deleted,omitempty"`
+}
+
+type HypertableScheduledStage struct {
+	ID          int64  `json:"id"`
+	Query       string `json:"query"`
+	Name        string `json:"name"`
+	ShortName   string `json:"shortName"`
+	Description string `json:"description,omitempty"`
+	RunStatus   string `json:"runStatus,omitempty"`
+	StartTime   string `json:"startTime,omitempty"`
+	Duration    string `json:"duration,omitempty"`
+	Errors      int64  `json:"errors,omitempty"`
 }
 
 func (c *Client) CreateHypertable(payload Hypertable) (Hypertable, error) {
@@ -43,6 +64,33 @@ func (c *Client) CreateHypertable(payload Hypertable) (Hypertable, error) {
 			return source, err
 		} else {
 			return source, fmt.Errorf(msg)
+		}
+	}
+}
+
+func (c *Client) UpdateStatusHypertable(id string, payload Hypertable, status bool) error {
+	// logger := fwhelpers.GetLogger()
+
+	method := "GET"
+	query := fmt.Sprintf(
+		"catalogName=hypertables&schemaName=default&tableName=%s&id=%s&status=%t",
+		payload.ShortName, id, status,
+	)
+	url := c.Host + "/api/v1/catalog/hypertable/activate?" + query
+
+	b, statusCode, _, _, _, err := c.doRequest(method, url, nil, nil)
+	if err != nil {
+		return err
+	}
+
+	if statusCode >= 200 && statusCode <= 299 {
+		return nil
+	} else {
+		msg, err := c.getAPIError(b)
+		if err != nil {
+			return err
+		} else {
+			return fmt.Errorf(msg)
 		}
 	}
 }

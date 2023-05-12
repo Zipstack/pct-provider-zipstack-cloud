@@ -7,5 +7,7 @@ github.com/zipstack/go-cty v1.13.1-pct.1 h1:kstog34t8kcL5+Wb51wkvYW2e4exi1Jpw4xm
 github.com/zipstack/go-cty v1.13.1-pct.1/go.mod h1:YKQzy/7pZ7iq2jNFzy5go57xdxdWoLLpaEp4u238AE0=
 github.com/zipstack/pct-plugin-framework v1.1.0 h1:rxKRfN/6wtURhHT9B63F2+2wOCvv3SApGxWzjzabW1k=
 github.com/zipstack/pct-plugin-framework v1.1.0/go.mod h1:OQNOdOoEEVYsNvfVrcJDZlk4lDqXJGQlH4zrQBaHuDE=
-golang.org/x/text v0.8.0 h1:57P1ETyNKtuIjB4SRd15iJxuhj8Gc416Y78H3qgMh68=
-golang.org/x/text v0.8.0/go.mod h1:e1OnstbJyHTd6l/uOt8jFFHp6TRDWZR/bV3emEE/zU8=
+golang.org/x/exp v0.0.0-20230425010034-47ecfdc1ba53 h1:5llv2sWeaMSnA3w2kS57ouQQ4pudlXrR0dCgw51QK9o=
+golang.org/x/exp v0.0.0-20230425010034-47ecfdc1ba53/go.mod h1:V1LtkGg67GoY2N1AnLN78QLrzxkLyJw7RJb1gzOOz9w=
+golang.org/x/text v0.9.0 h1:2sjJmO8cDvYveuX97RDLsxlyUxLl+GHoLxBiRdHllBE=
+golang.org/x/text v0.9.0/go.mod h1:e1OnstbJyHTd6l/uOt8jFFHp6TRDWZR/bV3emEE/zU8=
