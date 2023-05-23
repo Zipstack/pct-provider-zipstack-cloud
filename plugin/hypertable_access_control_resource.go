@@ -17,6 +17,7 @@ type hypertableAccessControlResource struct {
 }
 
 type hypertableAccessControlResourceModel struct {
+	PolicyId     string `pctsdk:"policy_id"`
 	HypertableId string `pctsdk:"hypertable_id"`
 	UserEmail    string `pctsdk:"user_email"`
 	GroupName    string `pctsdk:"group_name"`
@@ -70,6 +71,10 @@ func (r *hypertableAccessControlResource) Schema() *schema.ServiceResponse {
 	s := &schema.Schema{
 		Description: "Hypertable access control resource for Zipstack Cloud",
 		Attributes: map[string]schema.Attribute{
+			"policy_id": &schema.StringAttribute{
+				Description: "Policy ID",
+				Computed:    true,
+			},
 			"hypertable_id": &schema.StringAttribute{
 				Description: "Hypertable ID",
 				Required:    true,
@@ -127,15 +132,49 @@ func (r *hypertableAccessControlResource) Create(req *schema.ServiceRequest) *sc
 	}
 	if status != "true" {
 		return schema.ErrorResponse(fmt.Errorf(
-			"failed to update access control",
+			"failed to create access control",
 		))
 	}
 
-	// Update resource state with response body
+	// Update state with refreshed value
 	state := hypertableAccessControlResourceModel{}
-	state.HypertableId = plan.HypertableId
-	state.UserEmail = plan.UserEmail
-	state.GroupName = plan.GroupName
+
+	// Query using created state.
+	htACL, err := r.Client.ReadHypertableAccessControl(plan.HypertableId)
+	if err != nil {
+		return schema.ErrorResponse(err)
+	}
+
+	// For a given hypertable, the list of users or groups
+	// is returned. Hence, we need to retrieve the matching
+	// hypertable ID and user or group combination.
+	found := false
+	if len(plan.UserEmail) > 0 {
+		for _, policy := range htACL.Users {
+			if policy.Member == plan.UserEmail {
+				state.PolicyId = policy.PolicyId
+				state.UserEmail = policy.Member
+				found = true
+				break
+			}
+		}
+	}
+	if !found && len(plan.GroupName) > 0 {
+		for _, policy := range htACL.Groups {
+			if policy.Member == plan.GroupName {
+				state.PolicyId = policy.PolicyId
+				state.GroupName = policy.Member
+				found = true
+				break
+			}
+		}
+	}
+
+	if !found {
+		return schema.ErrorResponse(fmt.Errorf("failed to create access control"))
+	}
+
+	state.HypertableId = htACL.HypertableId
 
 	// Set refreshed state
 	userOrGroup := plan.UserEmail
@@ -190,47 +229,55 @@ func (r *hypertableAccessControlResource) Read(req *schema.ServiceRequest) *sche
 		} else {
 			// Query using existing previous state.
 			htACL, err := r.Client.ReadHypertableAccessControl(hypertableId)
-			if err != nil {
+
+			if err != nil && err.Error() == "Not Found" {
+				// No previous state exists.
+				res.StateID = ""
+				res.StateLastUpdated = ""
+			} else if err != nil {
 				return schema.ErrorResponse(err)
-			}
+			} else {
+				// Update state with refreshed value
+				state.PolicyId = ""
+				state.HypertableId = ""
+				state.UserEmail = ""
+				state.GroupName = ""
 
-			// Update state with refreshed value
-			state.HypertableId = ""
-			state.UserEmail = ""
-			state.GroupName = ""
-
-			// For a given hypertable, the list of users or groups
-			// is returned. Hence, we need to retrieve the matching
-			// hypertable ID and user or group combination.
-			found := false
-			for _, policy := range htACL.Users {
-				if policy.Member == userOrGroup {
-					state.UserEmail = policy.Member
-					found = true
-					break
-				}
-			}
-			if !found {
-				for _, policy := range htACL.Groups {
+				// For a given hypertable, the list of users or groups
+				// is returned. Hence, we need to retrieve the matching
+				// hypertable ID and user or group combination.
+				found := false
+				for _, policy := range htACL.Users {
 					if policy.Member == userOrGroup {
-						state.GroupName = policy.Member
+						state.PolicyId = policy.PolicyId
+						state.UserEmail = policy.Member
 						found = true
 						break
 					}
 				}
-			}
+				if !found {
+					for _, policy := range htACL.Groups {
+						if policy.Member == userOrGroup {
+							state.PolicyId = policy.PolicyId
+							state.GroupName = policy.Member
+							found = true
+							break
+						}
+					}
+				}
 
-			if found {
-				state.HypertableId = htACL.HypertableId
+				if found {
+					state.HypertableId = htACL.HypertableId
 
-				res.StateID = r.Client.GetHypertableAccessControlStateId(
-					hypertableId, userOrGroup,
-				)
-				res.StateLastUpdated = time.Now().UTC().Format(time.RFC850)
-			} else {
-				// No previous state exists.
-				res.StateID = ""
-				res.StateLastUpdated = ""
+					res.StateID = r.Client.GetHypertableAccessControlStateId(
+						hypertableId, userOrGroup,
+					)
+					res.StateLastUpdated = time.Now().UTC().Format(time.RFC850)
+				} else {
+					// No previous state exists.
+					res.StateID = ""
+					res.StateLastUpdated = ""
+				}
 			}
 		}
 	} else {

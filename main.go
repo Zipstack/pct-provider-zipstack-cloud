@@ -16,5 +16,7 @@ func main() {
 		plugin.NewHypertableLiveResource,
 		plugin.NewHypertableScheduledResource,
 		plugin.NewHypertableAccessControlResource,
+		plugin.NewHypertableDataMaskResource,
+		plugin.NewHypertableRowFilterResource,
 	})
 }

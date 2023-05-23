@@ -20,11 +20,8 @@ type HypertableAccessControlList struct {
 }
 
 type accessControlUserOrGroup struct {
-	PolicyId         string `json:"policyId"`
-	Column           string `json:"column"`
-	MaskingOption    string `json:"maskingOption"`
-	FilterExpression string `json:"filterExpression"`
-	Member           string `json:"member"`
+	PolicyId string `json:"policyId"`
+	Member   string `json:"member"`
 }
 
 func (c *Client) GetHypertableAccessControlStateId(hypertableId string, userOrGroup string) string {
