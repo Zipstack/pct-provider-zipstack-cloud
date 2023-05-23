@@ -12,37 +12,39 @@ import (
 )
 
 // Resource implementation.
-type hypertableAccessControlResource struct {
+type hypertableDataMaskResource struct {
 	Client *api.Client
 }
 
-type hypertableAccessControlResourceModel struct {
-	PolicyId     string `pctsdk:"policy_id"`
-	HypertableId string `pctsdk:"hypertable_id"`
-	UserEmail    string `pctsdk:"user_email"`
-	GroupName    string `pctsdk:"group_name"`
+type hypertableDataMaskResourceModel struct {
+	PolicyId      string `pctsdk:"policy_id"`
+	HypertableId  string `pctsdk:"hypertable_id"`
+	UserEmail     string `pctsdk:"user_email"`
+	GroupName     string `pctsdk:"group_name"`
+	MaskingOption string `pctsdk:"masking_option"`
+	Column        string `pctsdk:"column"`
 }
 
 // Ensure the implementation satisfies the expected interfaces.
 var (
-	_ schema.ResourceService = &hypertableAccessControlResource{}
+	_ schema.ResourceService = &hypertableDataMaskResource{}
 )
 
 // Helper function to return a resource service instance.
-func NewHypertableAccessControlResource() schema.ResourceService {
-	return &hypertableAccessControlResource{}
+func NewHypertableDataMaskResource() schema.ResourceService {
+	return &hypertableDataMaskResource{}
 }
 
 // Metadata returns the resource type name.
 // It is always provider name + "_" + resource type name.
-func (r *hypertableAccessControlResource) Metadata(req *schema.ServiceRequest) *schema.ServiceResponse {
+func (r *hypertableDataMaskResource) Metadata(req *schema.ServiceRequest) *schema.ServiceResponse {
 	return &schema.ServiceResponse{
-		TypeName: req.TypeName + "_hypertable_access_control",
+		TypeName: req.TypeName + "_hypertable_data_mask",
 	}
 }
 
 // Configure adds the provider configured client to the resource.
-func (r *hypertableAccessControlResource) Configure(req *schema.ServiceRequest) *schema.ServiceResponse {
+func (r *hypertableDataMaskResource) Configure(req *schema.ServiceRequest) *schema.ServiceResponse {
 	if req.ResourceData == "" {
 		return schema.ErrorResponse(fmt.Errorf("no data provided to configure resource"))
 	}
@@ -67,9 +69,9 @@ func (r *hypertableAccessControlResource) Configure(req *schema.ServiceRequest) 
 }
 
 // Schema defines the schema for the resource.
-func (r *hypertableAccessControlResource) Schema() *schema.ServiceResponse {
+func (r *hypertableDataMaskResource) Schema() *schema.ServiceResponse {
 	s := &schema.Schema{
-		Description: "Hypertable access control resource for Zipstack Cloud",
+		Description: "Hypertable data mask resource for Zipstack Cloud",
 		Attributes: map[string]schema.Attribute{
 			"policy_id": &schema.StringAttribute{
 				Description: "Policy ID",
@@ -89,6 +91,14 @@ func (r *hypertableAccessControlResource) Schema() *schema.ServiceResponse {
 				Required:    true,
 				Optional:    true,
 			},
+			"masking_option": &schema.StringAttribute{
+				Description: "Masking Option",
+				Required:    true,
+			},
+			"column": &schema.StringAttribute{
+				Description: "Column",
+				Required:    true,
+			},
 		},
 	}
 
@@ -103,11 +113,11 @@ func (r *hypertableAccessControlResource) Schema() *schema.ServiceResponse {
 }
 
 // Create a new resource
-func (r *hypertableAccessControlResource) Create(req *schema.ServiceRequest) *schema.ServiceResponse {
+func (r *hypertableDataMaskResource) Create(req *schema.ServiceRequest) *schema.ServiceResponse {
 	// logger := fwhelpers.GetLogger()
 
 	// Retrieve values from plan
-	var plan hypertableAccessControlResourceModel
+	var plan hypertableDataMaskResourceModel
 	err := fwhelpers.UnpackModel(req.PlanContents, &plan)
 	if err != nil {
 		return schema.ErrorResponse(err)
@@ -118,29 +128,36 @@ func (r *hypertableAccessControlResource) Create(req *schema.ServiceRequest) *sc
 			"both user email and group name cannot be provided",
 		))
 	}
+	if plan.Column == "" {
+		return schema.ErrorResponse(fmt.Errorf(
+			"column is required",
+		))
+	}
 
 	// Generate API request body from plan
-	body := api.HypertableAccessControl{}
+	body := api.HypertableDataMask{}
 	body.HypertableId = plan.HypertableId
 	body.UserEmail = plan.UserEmail
 	body.GroupName = plan.GroupName
+	body.MaskingOption = plan.MaskingOption
+	body.Column = plan.Column
 
-	// Create or update hypertable access control
-	status, err := r.Client.CreateHypertableAccessControl(body)
+	// Create or update hypertable data mask
+	status, err := r.Client.CreateHypertableDataMask(body)
 	if err != nil {
 		return schema.ErrorResponse(err)
 	}
 	if status != "true" {
 		return schema.ErrorResponse(fmt.Errorf(
-			"failed to create access control",
+			"failed to create data mask",
 		))
 	}
 
 	// Update state with refreshed value
-	state := hypertableAccessControlResourceModel{}
+	state := hypertableDataMaskResourceModel{}
 
 	// Query using created state.
-	htACL, err := r.Client.ReadHypertableAccessControl(plan.HypertableId)
+	htDataMasks, err := r.Client.ReadHypertableDataMask(plan.HypertableId)
 	if err != nil {
 		return schema.ErrorResponse(err)
 	}
@@ -150,20 +167,26 @@ func (r *hypertableAccessControlResource) Create(req *schema.ServiceRequest) *sc
 	// hypertable ID and user or group combination.
 	found := false
 	if len(plan.UserEmail) > 0 {
-		for _, policy := range htACL.Users {
-			if policy.Member == plan.UserEmail {
+		for _, policy := range htDataMasks.Users {
+			if policy.Member == plan.UserEmail && policy.Column == plan.Column {
 				state.PolicyId = policy.PolicyId
 				state.UserEmail = policy.Member
+				state.MaskingOption = policy.MaskingOption
+				state.Column = policy.Column
+
 				found = true
 				break
 			}
 		}
 	}
 	if !found && len(plan.GroupName) > 0 {
-		for _, policy := range htACL.Groups {
-			if policy.Member == plan.GroupName {
+		for _, policy := range htDataMasks.Groups {
+			if policy.Member == plan.GroupName && policy.Column == plan.Column {
 				state.PolicyId = policy.PolicyId
 				state.GroupName = policy.Member
+				state.MaskingOption = policy.MaskingOption
+				state.Column = policy.Column
+
 				found = true
 				break
 			}
@@ -171,10 +194,10 @@ func (r *hypertableAccessControlResource) Create(req *schema.ServiceRequest) *sc
 	}
 
 	if !found {
-		return schema.ErrorResponse(fmt.Errorf("failed to create access control"))
+		return schema.ErrorResponse(fmt.Errorf("failed to create data mask"))
 	}
 
-	state.HypertableId = htACL.HypertableId
+	state.HypertableId = htDataMasks.HypertableId
 
 	// Set refreshed state
 	userOrGroup := plan.UserEmail
@@ -184,8 +207,8 @@ func (r *hypertableAccessControlResource) Create(req *schema.ServiceRequest) *sc
 	// We create a resource for each user or group, but
 	// the retrieval from provider is via hypertable ID.
 	// Hence state ID needs to be a combination of both.
-	stateId := r.Client.GetHypertableAccessControlStateId(
-		plan.HypertableId, userOrGroup,
+	stateId := r.Client.GetHypertableDataMaskStateId(
+		state.HypertableId, userOrGroup, state.Column,
 	)
 	stateEnc, err := fwhelpers.PackModel(nil, &state)
 	if err != nil {
@@ -200,10 +223,10 @@ func (r *hypertableAccessControlResource) Create(req *schema.ServiceRequest) *sc
 }
 
 // Read resource information
-func (r *hypertableAccessControlResource) Read(req *schema.ServiceRequest) *schema.ServiceResponse {
+func (r *hypertableDataMaskResource) Read(req *schema.ServiceRequest) *schema.ServiceResponse {
 	// logger := fwhelpers.GetLogger()
 
-	var state hypertableAccessControlResourceModel
+	var state hypertableDataMaskResourceModel
 
 	// Get current state
 	err := fwhelpers.UnpackModel(req.StateContents, &state)
@@ -214,12 +237,12 @@ func (r *hypertableAccessControlResource) Read(req *schema.ServiceRequest) *sche
 	res := schema.ServiceResponse{}
 
 	if req.StateID != "" {
-		hypertableId, userOrGroup := "", ""
-		parts := r.Client.ParseHypertableAccessControlStateId(
+		hypertableId, userOrGroup, column := "", "", ""
+		parts := r.Client.ParseHypertableDataMaskStateId(
 			req.StateID,
 		)
-		if len(parts) == 2 {
-			hypertableId, userOrGroup = parts[0], parts[1]
+		if len(parts) == 3 {
+			hypertableId, userOrGroup, column = parts[0], parts[1], parts[2]
 		}
 
 		if hypertableId == "" || userOrGroup == "" {
@@ -228,9 +251,9 @@ func (r *hypertableAccessControlResource) Read(req *schema.ServiceRequest) *sche
 			res.StateLastUpdated = ""
 		} else {
 			// Query using existing previous state.
-			htACL, err := r.Client.ReadHypertableAccessControl(hypertableId)
+			htDataMasks, err := r.Client.ReadHypertableDataMask(hypertableId)
 
-			if err != nil && err.Error() == "Not Found" {
+			if err != nil && err.Error() == "404 Not Found" {
 				// No previous state exists.
 				res.StateID = ""
 				res.StateLastUpdated = ""
@@ -242,24 +265,32 @@ func (r *hypertableAccessControlResource) Read(req *schema.ServiceRequest) *sche
 				state.HypertableId = ""
 				state.UserEmail = ""
 				state.GroupName = ""
+				state.MaskingOption = ""
+				state.Column = ""
 
 				// For a given hypertable, the list of users or groups
 				// is returned. Hence, we need to retrieve the matching
 				// hypertable ID and user or group combination.
 				found := false
-				for _, policy := range htACL.Users {
-					if policy.Member == userOrGroup {
+				for _, policy := range htDataMasks.Users {
+					if policy.Member == userOrGroup && policy.Column == column {
 						state.PolicyId = policy.PolicyId
 						state.UserEmail = policy.Member
+						state.MaskingOption = policy.MaskingOption
+						state.Column = policy.Column
+
 						found = true
 						break
 					}
 				}
 				if !found {
-					for _, policy := range htACL.Groups {
-						if policy.Member == userOrGroup {
+					for _, policy := range htDataMasks.Groups {
+						if policy.Member == userOrGroup && policy.Column == column {
 							state.PolicyId = policy.PolicyId
 							state.GroupName = policy.Member
+							state.MaskingOption = policy.MaskingOption
+							state.Column = policy.Column
+
 							found = true
 							break
 						}
@@ -267,10 +298,10 @@ func (r *hypertableAccessControlResource) Read(req *schema.ServiceRequest) *sche
 				}
 
 				if found {
-					state.HypertableId = htACL.HypertableId
+					state.HypertableId = htDataMasks.HypertableId
 
-					res.StateID = r.Client.GetHypertableAccessControlStateId(
-						hypertableId, userOrGroup,
+					res.StateID = r.Client.GetHypertableDataMaskStateId(
+						hypertableId, userOrGroup, column,
 					)
 					res.StateLastUpdated = time.Now().UTC().Format(time.RFC850)
 				} else {
@@ -297,7 +328,7 @@ func (r *hypertableAccessControlResource) Read(req *schema.ServiceRequest) *sche
 }
 
 // Update the resource information
-func (r *hypertableAccessControlResource) Update(req *schema.ServiceRequest) *schema.ServiceResponse {
+func (r *hypertableDataMaskResource) Update(req *schema.ServiceRequest) *schema.ServiceResponse {
 	// logger := fwhelpers.GetLogger()
 
 	return schema.ErrorResponse(fmt.Errorf(
@@ -306,15 +337,15 @@ func (r *hypertableAccessControlResource) Update(req *schema.ServiceRequest) *sc
 }
 
 // Delete deletes the resource and removes the state on success.
-func (r *hypertableAccessControlResource) Delete(req *schema.ServiceRequest) *schema.ServiceResponse {
+func (r *hypertableDataMaskResource) Delete(req *schema.ServiceRequest) *schema.ServiceResponse {
 	// logger := fwhelpers.GetLogger()
 
-	hypertableId, userOrGroup := "", ""
-	parts := r.Client.ParseHypertableAccessControlStateId(
+	hypertableId, userOrGroup, column := "", "", ""
+	parts := r.Client.ParseHypertableDataMaskStateId(
 		req.StateID,
 	)
-	if len(parts) == 2 {
-		hypertableId, userOrGroup = parts[0], parts[1]
+	if len(parts) == 3 {
+		hypertableId, userOrGroup, column = parts[0], parts[1], parts[2]
 	} else {
 		return schema.ErrorResponse(fmt.Errorf(
 			"invalid hypertable ID or user or group",
@@ -322,15 +353,16 @@ func (r *hypertableAccessControlResource) Delete(req *schema.ServiceRequest) *sc
 	}
 
 	// Delete existing source
-	body := api.HypertableAccessControl{}
+	body := api.HypertableDataMask{}
 	body.HypertableId = hypertableId
 	if strings.Contains(userOrGroup, "@") {
 		body.UserEmail = userOrGroup
 	} else {
 		body.GroupName = userOrGroup
 	}
+	body.Column = column
 
-	err := r.Client.DeleteHypertableAccessControl(body)
+	err := r.Client.DeleteHypertableDataMask(body)
 	if err != nil {
 		return schema.ErrorResponse(err)
 	}

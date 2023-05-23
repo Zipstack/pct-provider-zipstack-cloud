@@ -65,14 +65,17 @@ func (c *Client) getAPIError(body []byte) (string, error) {
 		return "", fmt.Errorf("content type mismatch or invalid provider api host or path")
 	} else {
 		slices := strings.Split(apiErr.Message, "at [Source:")
-		msg := slices[0]
+		msg := ""
 		if len(apiErr.ValidationErrors) > 0 {
+			msg := slices[0]
 			msg += ", Errors: ["
 			for _, ve := range apiErr.ValidationErrors {
 				msg += ve.DefaultMessage + ": \"" + ve.RejectedValue + "\", "
 			}
 			msg = strings.TrimSuffix(msg, ", ")
 			msg += "]"
+		} else {
+			msg = fmt.Sprintf("%d %s", apiErr.Status, apiErr.Error)
 		}
 		return strings.TrimSpace(msg), nil
 	}
