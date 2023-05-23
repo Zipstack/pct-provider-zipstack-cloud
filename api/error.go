@@ -64,10 +64,10 @@ func (c *Client) getAPIError(body []byte) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("content type mismatch or invalid provider api host or path")
 	} else {
-		slices := strings.Split(apiErr.Message, "at [Source:")
 		msg := ""
 		if len(apiErr.ValidationErrors) > 0 {
-			msg := slices[0]
+			slices := strings.Split(apiErr.Message, "at [Source:")
+			msg = slices[0]
 			msg += ", Errors: ["
 			for _, ve := range apiErr.ValidationErrors {
 				msg += ve.DefaultMessage + ": \"" + ve.RejectedValue + "\", "
